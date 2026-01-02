@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cart</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>🛒 Cart</h1>
+    <div class="topbar-actions">
+      <a class="btn" href="index.html">Catalog</a>
+      <a class="btn" href="orders.html">📦 My Orders</a>
+    </div>
+  </header>
+
+  <main class="cart-wrap">
+    <div id="cart-items"></div>
+
+    <div class="cart-summary">
+      <h2 id="total">Total: 0 BGN</h2>
+
+      <div class="pay-box">
+        <h3>Payment (Stripe test)</h3>
+        <p class="muted">
+          Enter test card details. Card data goes to Stripe UI (not your server).
+        </p>
+
+        <form id="payment-form">
+          <div id="card-element" class="card-box"></div>
+
+          <button class="btn" id="payBtn" type="submit">💳 Pay & Finish Order</button>
+        </form>
+
+        <p id="payment-error" class="error"></p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Stripe must be loaded BEFORE cart.js uses Stripe() -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <script type="module" src="js/cart.js"></script>
+</body>
+</html>

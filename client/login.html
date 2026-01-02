@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="auth-card">
+    <h1>Login</h1>
+    <input id="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button id="btn">Login</button>
+    <p>No account? <a href="register.html">Register</a></p>
+    <p><a href="index.html">Back to catalog</a></p>
+  </div>
+
+  <script type="module">
+    import { login } from "./js/auth.js";
+
+    document.getElementById("btn").addEventListener("click", async () => {
+      try {
+        await login(email.value.trim(), password.value);
+        window.location.href = "index.html";
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+  </script>
+</body>
+</html>

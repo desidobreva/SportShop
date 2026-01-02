@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Orders</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <h1>🛠 Admin – Orders</h1>
+  <div class="topbar-actions">
+    <a class="btn" href="index.html">Catalog</a>
+  </div>
+</header>
+
+<main class="container">
+  <label>
+    Filter by status:
+    <select id="filter">
+      <option value="">All</option>
+      <option>CREATED</option>
+      <option>STOCK_CONFIRMED</option>
+      <option>PAYMENT_AUTHORIZED</option>
+      <option>SHIPPING_IN_PROGRESS</option>
+      <option>COMPLETED</option>
+    </select>
+  </label>
+
+  <div id="admin-orders"></div>
+</main>
+
+<script type="module" src="js/admin-orders.js"></script>
+</body>
+</html>

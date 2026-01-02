@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sport Shop</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>🏪 Sport Shop</h1>
+    <input type="text" id="search" placeholder="Search products...">
+
+    <div class="topbar-actions" id="auth-actions">
+      <a class="btn" href="cart.html">🛒 Cart</a>
+      <a class="btn" href="login.html">Login</a>
+      <a class="btn" href="register.html">Register</a>
+    </div>
+  </header>
+
+  <main id="catalog"></main>
+
+  <script type="module" src="js/catalog.js"></script>
+
+  <script type="module">
+    import { getCurrentUser, logout, isLoggedIn } from "./js/auth.js";
+
+    const authDiv = document.getElementById("auth-actions");
+
+    function renderAuth() {
+      const user = getCurrentUser();
+
+      if (isLoggedIn() && user) {
+        authDiv.innerHTML = `
+          <span class="user-info">👤 ${user.email}</span>
+
+          <a class="btn" href="orders.html">📦 My Orders</a>
+          <a class="btn" href="cart.html">🛒 Cart</a>
+
+          ${user.role === "ADMIN" ? `
+            <a class="btn" href="admin-orders.html">🛠️ Admin Orders</a>
+            <a class="btn"
+               href="http://localhost:3000/api/export/catalog.xml"
+               target="_blank">
+               XML Export
+            </a>
+          ` : ""}
+
+          <button class="btn" id="logoutBtn">Logout</button>
+        `;
+
+        document.getElementById("logoutBtn").onclick = () => {
+          logout();
+          window.location.reload();
+        };
+      } else {
+        authDiv.innerHTML = `
+          <a class="btn" href="login.html">Login</a>
+          <a class="btn" href="register.html">Register</a>
+        `;
+      }
+    }
+
+    renderAuth();
+  </script>
+</body>
+</html>
