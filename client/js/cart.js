@@ -102,7 +102,7 @@ function renderCart() {
   });
 }
 
-// ---------- Payment submit ----------
+// ---------- Payment ----------
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   paymentError.textContent = "";
@@ -126,20 +126,40 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
+    // 1) create order + payment intent
     const result = await api("/orders/checkout", {
       method: "POST",
       body: { paymentMethodId: paymentMethod.id }
     });
 
-    toast(`Order status: ${result.status}`);
+    // 2) confirm payment in Stripe (THIS makes it appear as succeeded in Dashboard)
+    const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
+      result.clientSecret,
+      { payment_method: paymentMethod.id }
+    );
 
-    await fetchCart(); 
-    
-    card.clear();
-
-    if (result.status === "COMPLETED") {
-      window.location.href = "orders.html";
+    if (confirmError) {
+      paymentError.textContent = confirmError.message;
+      return;
     }
+
+    if (paymentIntent.status !== "succeeded") {
+      paymentError.textContent = `Payment status: ${paymentIntent.status}`;
+      return;
+    }
+
+    // 3) tell backend "it succeeded" (backend re-checks Stripe + sends mailtrap email)
+    const confirmed = await api("/orders/confirm", {
+      method: "POST",
+      body: { orderId: result.orderId, paymentIntentId: paymentIntent.id }
+    });
+
+    toast(`Order status: ${confirmed.status}`);
+
+    await fetchCart();
+    card.clear();
+    window.location.href = "orders.html";
+
   } catch (err) {
     paymentError.textContent = err.message;
   } finally {
@@ -148,4 +168,3 @@ form.addEventListener("submit", async (e) => {
 });
 
 fetchCart();
-

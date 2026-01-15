@@ -1,62 +1,53 @@
 import { api } from "./api.js";
-import { requireAuthOrRedirect } from "./auth.js";
+import { requireAuthOrRedirect, getCurrentUser } from "./auth.js";
 
 requireAuthOrRedirect();
 
-const div = document.getElementById("admin-orders");
-const filter = document.getElementById("filter");
-
-function badge(status) {
-  return `<span class="status ${status.toLowerCase()}">${status}</span>`;
+const user = getCurrentUser();
+if (!user || user.role !== "ADMIN") {
+  // ако не е админ → обратно към login
+  localStorage.clear();
+  window.location.href = "login.html";
 }
 
-async function loadAdminOrders() {
+const filter = document.getElementById("filter");
+const container = document.getElementById("admin-orders");
+
+function orderCard(o) {
+  return `
+    <div class="order-card">
+      <div class="order-main">
+        <div>
+          <strong>Order #${o.id}</strong>
+          <div class="muted">${new Date(o.created_at).toLocaleString()}</div>
+          <div class="muted">User: ${o.email}</div>
+        </div>
+
+        <div class="order-total">${Number(o.total).toFixed(2)} BGN</div>
+
+        <div>
+          <span class="status ${String(o.status).toLowerCase()}">${o.status}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function load() {
+  container.innerHTML = `<p class="muted">Loading...</p>`;
   try {
     const status = filter.value;
-    const orders = await api(
-      status ? `/orders/admin/all?status=${status}` : "/orders/admin/all"
-    );
-
-    if (orders.length === 0) {
-      div.innerHTML = "<p>No orders.</p>";
+    const qs = status ? `?status=${encodeURIComponent(status)}` : "";
+    const orders = await api(`/orders/admin/all${qs}`);
+    if (!orders.length) {
+      container.innerHTML = `<p>No orders.</p>`;
       return;
     }
-
-    div.innerHTML = orders.map(o => `
-      <div class="order-card">
-        <div>
-          <strong>#${o.id}</strong><br>
-          <span class="muted">${o.email}</span><br>
-          <span class="muted">${new Date(o.created_at).toLocaleString()}</span>
-        </div>
-
-        <div>${badge(o.status)}</div>
-
-        <div>
-          <strong>${Number(o.total).toFixed(2)} BGN</strong>
-        </div>
-
-        <select data-id="${o.id}">
-          ${["CREATED","STOCK_CONFIRMED","PAYMENT_AUTHORIZED","SHIPPING_IN_PROGRESS","COMPLETED"]
-            .map(s => `<option ${s===o.status?"selected":""}>${s}</option>`)
-            .join("")}
-        </select>
-      </div>
-    `).join("");
-
-    document.querySelectorAll("select[data-id]").forEach(sel => {
-      sel.onchange = async () => {
-        await api(`/orders/admin/${sel.dataset.id}/status`, {
-          method: "POST",
-          body: { status: sel.value }
-        });
-      };
-    });
-
-  } catch (err) {
-    div.innerHTML = `<p class="error">${err.message}</p>`;
+    container.innerHTML = orders.map(orderCard).join("");
+  } catch (e) {
+    container.innerHTML = `<p class="error">${e.message}</p>`;
   }
 }
 
-filter.onchange = loadAdminOrders;
-loadAdminOrders();
+filter.addEventListener("change", load);
+load();

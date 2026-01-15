@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Make Admin (DEV)</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <h1>🛠 Make Admin (DEV)</h1>
+  <div class="topbar-actions">
+    <a class="btn" href="login.html">Login</a>
+    <a class="btn ghost" href="index.html">Catalog</a>
+  </div>
+</header>
+
+<main class="container">
+  <p class="muted">
+    1) Register a user first.<br/>
+    2) Enter email + secret and click "Make Admin".<br/>
+    3) Login again (token refresh).
+  </p>
+
+  <form id="make-form" class="card" style="padding:16px; max-width:520px;">
+    <label>Email</label>
+    <input name="email" type="email" required placeholder="admin@sportshop.bg" />
+
+    <label style="margin-top:10px;">Secret</label>
+    <input name="secret" type="text" required placeholder="dev_make_me_admin_123" />
+
+    <button class="btn" style="margin-top:12px;">Make Admin</button>
+    <div id="msg" class="muted" style="margin-top:10px;"></div>
+  </form>
+</main>
+
+<script type="module" src="js/make-admin.js"></script>
+</body>
+</html>

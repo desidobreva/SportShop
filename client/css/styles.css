@@ -256,3 +256,19 @@ h3 { margin: 10px 18px; color: #555; }
 .details-btn {
   align-self: flex-start;
 }
+
+.inp{
+  width: 120px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+.grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+}
+@media (max-width: 820px){
+  .grid{ grid-template-columns: 1fr; }
+}
