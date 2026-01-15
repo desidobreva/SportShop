@@ -44,4 +44,29 @@ router.post("/login", async (req, res) => {
   res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
 });
 
+/**
+ * DEV ONLY: Make a user ADMIN with a secret
+ * POST /api/auth/make-admin
+ * body: { email, secret }
+ */
+router.post("/make-admin", async (req, res) => {
+  const { email, secret } = req.body || {};
+  if (!email || !secret) return res.status(400).json({ message: "email/secret required" });
+
+  if (!process.env.ADMIN_MAKE_SECRET) {
+    return res.status(500).json({ message: "ADMIN_MAKE_SECRET is not set in .env" });
+  }
+
+  if (secret !== process.env.ADMIN_MAKE_SECRET) {
+    return res.status(403).json({ message: "Invalid secret" });
+  }
+
+  const [rows] = await pool.query("SELECT id, email, role FROM users WHERE email=?", [email]);
+  if (!rows[0]) return res.status(404).json({ message: "User not found. Register first." });
+
+  await pool.query("UPDATE users SET role='ADMIN' WHERE email=?", [email]);
+
+  return res.json({ message: "OK. User is now ADMIN. Please login again to refresh token." });
+});
+
 export default router;
